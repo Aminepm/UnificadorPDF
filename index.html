@@ -29,18 +29,9 @@
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   }
 
-  h1 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #1a1a1a;
-  }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; }
 
-  .subtitle {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 1.5rem;
-  }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
 
   #drop-zone {
     border: 1.5px dashed #ccc;
@@ -52,32 +43,15 @@
     margin-bottom: 1.25rem;
   }
 
-  #drop-zone:hover, #drop-zone.drag-over {
-    background: #f9f9f9;
-    border-color: #aaa;
-  }
+  #drop-zone:hover, #drop-zone.drag-over { background: #f9f9f9; border-color: #aaa; }
 
-  #drop-zone svg {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    color: #aaa;
-  }
+  #drop-zone svg { width: 32px; height: 32px; margin-bottom: 8px; color: #aaa; }
 
-  #drop-zone p.main {
-    font-size: 15px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 4px;
-  }
-
-  #drop-zone p.sub {
-    font-size: 13px;
-    color: #888;
-  }
+  #drop-zone p.main { font-size: 15px; font-weight: 500; color: #333; margin-bottom: 4px; }
+  #drop-zone p.sub { font-size: 13px; color: #888; }
+  #drop-zone p.sub span { color: #bbb; }
 
   #file-input { display: none; }
-
   #file-list { display: none; margin-bottom: 1.25rem; }
 
   .list-header {
@@ -87,126 +61,71 @@
     margin-bottom: 8px;
   }
 
-  .list-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
+  .list-label { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
 
   .clear-btn {
-    font-size: 12px;
-    color: #888;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 6px;
-    transition: background 0.15s;
+    font-size: 12px; color: #888; background: none; border: none;
+    cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: background 0.15s;
   }
-
   .clear-btn:hover { background: #f0f0f0; color: #333; }
 
   .file-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border: 1px solid #ebebeb;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    background: #fff;
-    cursor: grab;
-    transition: background 0.15s;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border: 1px solid #ebebeb; border-radius: 10px;
+    margin-bottom: 6px; background: #fff; cursor: grab; transition: background 0.15s;
   }
-
   .file-item:hover { background: #fafafa; }
   .file-item.dragging { opacity: 0.5; }
 
   .drag-handle { color: #ccc; font-size: 16px; cursor: grab; }
 
   .file-num {
-    background: #f0f0f0;
-    color: #666;
-    font-size: 11px;
-    font-weight: 600;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    background: #f0f0f0; color: #666; font-size: 11px; font-weight: 600;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
-  .pdf-icon { color: #e24b4a; flex-shrink: 0; }
+  .file-icon-pdf { color: #e24b4a; flex-shrink: 0; }
+  .file-icon-img { color: #4a90e2; flex-shrink: 0; }
+
+  .file-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 5px; border-radius: 4px;
+    flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .badge-pdf { background: #fdecea; color: #c62828; }
+  .badge-img { background: #e8f0fe; color: #1a56db; }
 
   .file-name {
-    flex: 1;
-    font-size: 13px;
-    color: #333;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex: 1; font-size: 13px; color: #333;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
-  .file-size {
-    font-size: 12px;
-    color: #aaa;
-    flex-shrink: 0;
-  }
+  .file-size { font-size: 12px; color: #aaa; flex-shrink: 0; }
 
   .remove-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #bbb;
-    padding: 2px 4px;
-    border-radius: 4px;
-    line-height: 1;
-    font-size: 16px;
-    transition: color 0.15s;
-    flex-shrink: 0;
+    background: none; border: none; cursor: pointer; color: #bbb;
+    padding: 2px 4px; border-radius: 4px; line-height: 1; font-size: 16px;
+    transition: color 0.15s; flex-shrink: 0;
   }
-
   .remove-btn:hover { color: #e24b4a; }
 
   .hint {
-    display: none;
-    background: #f7f7f7;
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-bottom: 1.25rem;
-    font-size: 12px;
-    color: #888;
+    display: none; background: #f7f7f7; border-radius: 8px;
+    padding: 9px 13px; margin-bottom: 1.25rem; font-size: 12px; color: #888;
   }
 
   #merge-btn {
-    width: 100%;
-    padding: 11px 20px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    border-radius: 10px;
-    background: #1a1a1a;
-    border: none;
-    color: #fff;
-    transition: background 0.2s, opacity 0.2s;
+    width: 100%; padding: 11px 20px; font-size: 15px; font-weight: 500;
+    cursor: pointer; border-radius: 10px; background: #1a1a1a;
+    border: none; color: #fff; transition: background 0.2s, opacity 0.2s;
   }
-
   #merge-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   #merge-btn:not(:disabled):hover { background: #333; }
 
   #status {
-    display: none;
-    margin-top: 1rem;
-    padding: 11px 15px;
-    border-radius: 10px;
-    font-size: 13px;
-    text-align: center;
+    display: none; margin-top: 1rem; padding: 11px 15px;
+    border-radius: 10px; font-size: 13px; text-align: center;
   }
-
   #status.success { background: #edf7ed; color: #2e7d32; }
   #status.error { background: #fdecea; color: #c62828; }
   #status.loading { background: #f5f5f5; color: #555; }
@@ -238,13 +157,18 @@
   <h1>Unificador de PDF</h1>
   <p class="subtitle">Todo se procesa en tu navegador. Ningún archivo sale de tu dispositivo.</p>
 
-  <div id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" role="button" tabindex="0" aria-label="Área para soltar archivos PDF">
+  <div id="drop-zone" onclick="document.getElementById('file-input').click()"
+       ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
+       role="button" tabindex="0" aria-label="Área para soltar archivos">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto;">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="15" y2="15"/>
     </svg>
-    <p class="main">Arrastra tus PDFs aquí</p>
-    <p class="sub">o haz clic para seleccionar archivos</p>
-    <input type="file" id="file-input" multiple accept=".pdf" onchange="handleFiles(this.files)">
+    <p class="main">Arrastra archivos aquí</p>
+    <p class="sub">PDF · <span>JPG · PNG · WEBP</span> — o haz clic para seleccionar</p>
+    <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,image/*" onchange="handleFiles(this.files)">
   </div>
 
   <div id="file-list">
@@ -255,15 +179,24 @@
     <div id="file-items"></div>
   </div>
 
-  <div class="hint" id="order-hint">↕ Arrastra los archivos para cambiar el orden de unificación</div>
+  <div class="hint" id="order-hint">↕ Arrastra los archivos para cambiar el orden</div>
 
-  <button id="merge-btn" onclick="mergePDFs()" disabled>Unificar PDFs</button>
+  <button id="merge-btn" onclick="mergePDFs()" disabled>Unificar</button>
 
   <div id="status"></div>
 </div>
 
 <script>
+const ACCEPTED_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 let files = [];
+
+function isAccepted(f) {
+  return ACCEPTED_TYPES.includes(f.type) || f.name.match(/\.(pdf|jpg|jpeg|png|webp)$/i);
+}
+
+function isImage(f) {
+  return f.type.startsWith('image/') || f.name.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+}
 
 function handleDragOver(e) {
   e.preventDefault();
@@ -275,11 +208,11 @@ function handleDragLeave() {
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('drop-zone').classList.remove('drag-over');
-  const dropped = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+  const dropped = Array.from(e.dataTransfer.files).filter(isAccepted);
   if (dropped.length) addFiles(dropped);
 }
 function handleFiles(fileList) {
-  addFiles(Array.from(fileList).filter(f => f.type === 'application/pdf'));
+  addFiles(Array.from(fileList).filter(isAccepted));
 }
 function addFiles(newFiles) {
   newFiles.forEach(f => files.push(f));
@@ -292,6 +225,19 @@ function removeFile(idx) {
 function clearAll() {
   files = [];
   renderList();
+}
+
+function fileIconSVG(isImg) {
+  if (isImg) {
+    return `<svg class="file-icon-img" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>`;
+  }
+  return `<svg class="file-icon-pdf" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+  </svg>`;
 }
 
 function renderList() {
@@ -318,6 +264,7 @@ function renderList() {
     const size = f.size < 1024 * 1024
       ? Math.round(f.size / 1024) + ' KB'
       : (f.size / 1024 / 1024).toFixed(1) + ' MB';
+    const img = isImage(f);
 
     const div = document.createElement('div');
     div.className = 'file-item';
@@ -326,7 +273,8 @@ function renderList() {
     div.innerHTML = `
       <span class="drag-handle" aria-hidden="true">⠿</span>
       <span class="file-num">${i + 1}</span>
-      <svg class="pdf-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      ${fileIconSVG(img)}
+      <span class="file-badge ${img ? 'badge-img' : 'badge-pdf'}">${img ? 'IMG' : 'PDF'}</span>
       <span class="file-name" title="${f.name}">${f.name}</span>
       <span class="file-size">${size}</span>
       <button class="remove-btn" onclick="removeFile(${i})" aria-label="Eliminar ${f.name}">×</button>`;
@@ -340,11 +288,7 @@ function renderList() {
 }
 
 let dragSrc = null;
-
-function dragStart(e) {
-  dragSrc = parseInt(this.dataset.idx);
-  this.classList.add('dragging');
-}
+function dragStart(e) { dragSrc = parseInt(this.dataset.idx); this.classList.add('dragging'); }
 function dragOver(e) { e.preventDefault(); }
 function dropItem(e) {
   e.preventDefault();
@@ -358,6 +302,25 @@ function dragEnd() {
   document.querySelectorAll('.file-item').forEach(el => el.classList.remove('dragging'));
 }
 
+// Convierte un File de imagen a páginas PDF usando pdf-lib
+async function imageToPdfPages(file, pdfDoc) {
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let img;
+  if (file.type === 'image/png' || file.name.match(/\.png$/i)) {
+    img = await pdfDoc.embedPng(bytes);
+  } else {
+    img = await pdfDoc.embedJpg(bytes);
+  }
+  const { width, height } = img.scale(1);
+  // Ajustar al tamaño A4 manteniendo proporción
+  const maxW = 595, maxH = 842;
+  const scale = Math.min(maxW / width, maxH / height, 1);
+  const W = width * scale, H = height * scale;
+  const page = pdfDoc.addPage([W, H]);
+  page.drawImage(img, { x: 0, y: 0, width: W, height: H });
+}
+
 async function mergePDFs() {
   if (files.length < 1) return;
   const btn = document.getElementById('merge-btn');
@@ -367,18 +330,24 @@ async function mergePDFs() {
   btn.textContent = 'Procesando...';
   status.className = 'loading';
   status.style.display = 'block';
-  status.textContent = 'Leyendo archivos...';
+  status.textContent = 'Preparando...';
 
   try {
     const { PDFDocument } = PDFLib;
     const merged = await PDFDocument.create();
 
     for (let i = 0; i < files.length; i++) {
-      status.textContent = `Procesando ${i + 1} de ${files.length}: ${files[i].name}`;
-      const buf = await files[i].arrayBuffer();
-      const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
-      const pages = await merged.copyPages(doc, doc.getPageIndices());
-      pages.forEach(p => merged.addPage(p));
+      const f = files[i];
+      status.textContent = `Procesando ${i + 1} de ${files.length}: ${f.name}`;
+
+      if (isImage(f)) {
+        await imageToPdfPages(f, merged);
+      } else {
+        const buf = await f.arrayBuffer();
+        const doc = await PDFDocument.load(buf, { ignoreEncryption: true });
+        const pages = await merged.copyPages(doc, doc.getPageIndices());
+        pages.forEach(p => merged.addPage(p));
+      }
     }
 
     status.textContent = 'Generando archivo...';
@@ -391,16 +360,18 @@ async function mergePDFs() {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
 
+    const imgs = files.filter(isImage).length;
+    const pdfs = files.length - imgs;
     const totalPages = merged.getPageCount();
     status.className = 'success';
-    status.textContent = `✓ Descargado correctamente · ${files.length} archivos · ${totalPages} páginas`;
+    status.textContent = `✓ Descargado · ${pdfs} PDF${pdfs !== 1 ? 's' : ''} + ${imgs} imagen${imgs !== 1 ? 'es' : ''} · ${totalPages} páginas`;
   } catch (err) {
     status.className = 'error';
     status.textContent = `Error: ${err.message}`;
   }
 
   btn.disabled = false;
-  btn.textContent = 'Unificar PDFs';
+  btn.textContent = 'Unificar';
 }
 </script>
 </body>
