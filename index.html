@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unificador de PDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui,-apple-system,sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .card { background: #fff; border-radius: 16px; border: 1px solid #e5e5e5; padding: 2rem; width: 100%; max-width: 580px; box-shadow: 0 2px 12px rgba(0,0,0,.06); display: flex; flex-direction: column; gap: 1.25rem; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .subtitle { font-size: 13px; color: #888; margin-top: 2px; }
+
+  /* DROP ZONE */
+  #drop-zone { border: 1.5px dashed #ccc; border-radius: 12px; padding: 1.75rem; text-align: center; cursor: pointer; transition: background .2s, border-color .2s; }
+  #drop-zone:hover, #drop-zone.drag-over { background: #f9f9f9; border-color: #aaa; }
+  #drop-zone p.main { font-size: 15px; font-weight: 500; color: #333; margin-bottom: 4px; }
+  #drop-zone p.sub { font-size: 13px; color: #888; }
+  #drop-zone p.sub span { color: #bbb; }
+  #file-input { display: none; }
+
+  /* FILE LIST */
+  #file-list { display: none; }
+  .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .list-label { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .06em; }
+  .clear-btn { font-size: 12px; color: #888; background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: background .15s; }
+  .clear-btn:hover { background: #f0f0f0; color: #333; }
+
+  .file-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #ebebeb; border-radius: 10px; margin-bottom: 6px; background: #fff; cursor: grab; transition: background .15s; }
+  .file-item:hover { background: #fafafa; }
+  .file-item.dragging { opacity: .5; }
+  .drag-handle { color: #ccc; font-size: 16px; }
+  .file-num { background: #f0f0f0; color: #666; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .file-name { flex: 1; font-size: 13px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-size { font-size: 12px; color: #aaa; flex-shrink: 0; }
+  .remove-btn { background: none; border: none; cursor: pointer; color: #bbb; padding: 2px 4px; border-radius: 4px; font-size: 16px; transition: color .15s; flex-shrink: 0; }
+  .remove-btn:hover { color: #e24b4a; }
+
+  .badge { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; text-transform: uppercase; }
+  .badge-pdf { background: #fdecea; color: #c62828; }
+  .badge-img { background: #e8f0fe; color: #1a56db; }
+  .badge-signed { background: #fff3e0; color: #e65100; }
+
+  .hint { display: none; background: #f7f7f7; border-radius: 8px; padding: 9px 13px; font-size: 12px; color: #888; }
+
+  /* WARN BOX */
+  .warn-box { background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #795548; display: none; line-height: 1.6; }
+  .warn-box b { color: #e65100; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: #f5f5f5; border-radius: 10px; padding: 4px; }
+  .tab { flex: 1; padding: 8px; border: none; border-radius: 7px; background: transparent; font-size: 13px; font-weight: 500; cursor: pointer; color: #888; transition: background .15s, color .15s; }
+  .tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+  /* COMPRESS */
+  .compress-wrap { display: none; flex-direction: column; gap: 12px; }
+  .compress-wrap.visible { display: flex; }
+  .compress-row { display: flex; align-items: center; gap: 8px; }
+  .compress-row label { font-size: 13px; color: #555; min-width: 130px; }
+  input[type=range] { flex: 1; accent-color: #1a1a1a; }
+  .compress-val { font-size: 13px; font-weight: 500; min-width: 36px; text-align: right; }
+  .compress-note { font-size: 12px; color: #999; }
+  .compress-result { background: #f0faf0; border: 1px solid #c8e6c9; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #2e7d32; text-align: center; display: none; }
+
+  /* ACTIONS */
+  .actions { display: flex; gap: 8px; }
+  #merge-btn { flex: 1; padding: 11px 20px; font-size: 15px; font-weight: 500; cursor: pointer; border-radius: 10px; background: #1a1a1a; border: none; color: #fff; transition: background .2s, opacity .2s; }
+  #merge-btn:disabled { opacity: .35; cursor: not-allowed; }
+  #merge-btn:not(:disabled):hover { background: #333; }
+  #compress-btn { flex: 1; padding: 11px 20px; font-size: 15px; font-weight: 500; cursor: pointer; border-radius: 10px; background: #fff; border: 1.5px solid #e5e5e5; color: #1a1a1a; transition: background .2s, opacity .2s; display: none; }
+  #compress-btn:disabled { opacity: .35; cursor: not-allowed; }
+  #compress-btn:not(:disabled):hover { background: #f5f5f5; }
+
+  #status { display: none; padding: 11px 15px; border-radius: 10px; font-size: 13px; text-align: center; }
+  #status.success { background: #edf7ed; color: #2e7d32; }
+  #status.error { background: #fdecea; color: #c62828; }
+  #status.loading { background: #f5f5f5; color: #555; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #111; }
+    .card { background: #1c1c1c; border-color: #2e2e2e; box-shadow: 0 2px 12px rgba(0,0,0,.3); }
+    h1, .file-name { color: #eee; }
+    .subtitle, .file-size, .drag-handle, .hint { color: #666; }
+    #drop-zone { border-color: #3a3a3a; }
+    #drop-zone:hover, #drop-zone.drag-over { background: #242424; border-color: #555; }
+    #drop-zone p.main { color: #ddd; }
+    .file-item { background: #1c1c1c; border-color: #2e2e2e; }
+    .file-item:hover { background: #242424; }
+    .file-num { background: #2a2a2a; color: #aaa; }
+    .clear-btn:hover { background: #2a2a2a; color: #eee; }
+    .hint { background: #242424; color: #666; }
+    .tabs { background: #2a2a2a; }
+    .tab { color: #666; }
+    .tab.active { background: #1c1c1c; color: #eee; }
+    .compress-row label { color: #aaa; }
+    .compress-note { color: #666; }
+    input[type=range] { accent-color: #eee; }
+    .compress-val { color: #eee; }
+    #compress-btn { background: #2a2a2a; border-color: #3a3a3a; color: #eee; }
+    #compress-btn:not(:disabled):hover { background: #333; }
+    #merge-btn { background: #eee; color: #111; }
+    #merge-btn:not(:disabled):hover { background: #fff; }
+    #status.loading { background: #242424; color: #bbb; }
+    #status.success { background: #1b3a1e; color: #81c784; }
+    #status.error { background: #3a1a1a; color: #ef9a9a; }
+    .warn-box { background: #2a1f0a; border-color: #5a3e0a; color: #ffcc80; }
+    .compress-result { background: #1b3a1e; border-color: #2e7d32; color: #81c784; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div>
+    <h1>Unificador de PDF</h1>
+    <p class="subtitle">Todo se procesa en tu navegador. Ningún archivo sale de tu dispositivo.</p>
+  </div>
+
+  <!-- DROP ZONE -->
+  <div id="drop-zone" onclick="document.getElementById('file-input').click()"
+       ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+    <p class="main">Arrastra archivos aquí</p>
+    <p class="sub">PDF · <span>JPG · PNG · WEBP</span> — o haz clic para seleccionar</p>
+    <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,image/*" onchange="handleFiles(this.files)">
+  </div>
+
+  <!-- FILE LIST -->
+  <div id="file-list">
+    <div class="list-header">
+      <span class="list-label">Archivos <span id="file-count"></span></span>
+      <button class="clear-btn" onclick="clearAll()">Limpiar todo</button>
+    </div>
+    <div id="file-items"></div>
+  </div>
+
+  <div class="hint" id="order-hint">↕ Arrastra para cambiar el orden</div>
+
+  <!-- SIGNED WARNING -->
+  <div class="warn-box" id="signed-warn">
+    <b>⚠ Documentos con firma digital detectados</b><br>
+    Los PDF firmados se incluirán en el resultado con su contenido visual intacto, pero las firmas digitales no se transferirán al archivo final. Si necesitas conservar la validez legal de las firmas, guarda los originales antes de continuar.
+  </div>
+
+  <!-- TABS: Unificar / Comprimir -->
+  <div class="tabs" id="tabs" style="display:none">
+    <button class="tab active" onclick="switchTab('merge')">Unificar</button>
+    <button class="tab" onclick="switchTab('compress')">Comprimir también</button>
+  </div>
+
+  <!-- COMPRESS OPTIONS -->
+  <div class="compress-wrap" id="compress-wrap">
+    <div class="compress-row">
+      <label>Calidad de imagen</label>
+      <input type="range" id="cq" min="0.3" max="1" step="0.05" value="0.75" oninput="document.getElementById('cq-val').textContent=Math.round(this.value*100)+'%'">
+      <span class="compress-val" id="cq-val">75%</span>
+    </div>
+    <div class="compress-row">
+      <label>Escala de página</label>
+      <input type="range" id="cs" min="0.5" max="2" step="0.1" value="1.2" oninput="document.getElementById('cs-val').textContent=parseFloat(this.value).toFixed(1)+'x'">
+      <span class="compress-val" id="cs-val">1.2x</span>
+    </div>
+    <p class="compress-note">Calidad 75% + escala 1.2x = buen equilibrio para documentos de oficina. Reduce la escala para mayor compresión.</p>
+    <div class="compress-result" id="compress-result"></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button id="merge-btn" onclick="run()" disabled>Unificar</button>
+    <button id="compress-btn" onclick="run()" disabled>Comprimir y unificar</button>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const ACCEPTED = ['application/pdf','image/jpeg','image/png','image/webp'];
+let files = [];
+let currentTab = 'merge';
+let dragSrc = null;
+
+function isAccepted(f) { return ACCEPTED.includes(f.type) || /\.(pdf|jpg|jpeg|png|webp)$/i.test(f.name); }
+function isPDF(f) { return f.type === 'application/pdf' || /\.pdf$/i.test(f.name); }
+function isImage(f) { return f.type.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(f.name); }
+
+// Signed detection
+function detectSigned(bytes) {
+  const chunk = bytes.slice(0, Math.min(bytes.length, 600000));
+  const str = new TextDecoder('latin1').decode(chunk);
+  return str.includes('/ByteRange') && (str.includes('/Sig') || str.includes('/DocMDP') || str.includes('/SigFlags'));
+}
+
+function handleDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function handleDragLeave() { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag-over');
+  addFiles(Array.from(e.dataTransfer.files).filter(isAccepted));
+}
+function handleFiles(fl) { addFiles(Array.from(fl).filter(isAccepted)); }
+
+async function addFiles(newFiles) {
+  for (const f of newFiles) {
+    const entry = { file: f, signed: false };
+    if (isPDF(f)) {
+      const buf = await f.arrayBuffer();
+      entry.bytes = new Uint8Array(buf);
+      entry.signed = detectSigned(entry.bytes);
+    }
+    files.push(entry);
+  }
+  renderList();
+}
+
+function removeFile(idx) { files.splice(idx, 1); renderList(); }
+function clearAll() { files = []; renderList(); }
+
+function renderList() {
+  const list = document.getElementById('file-list');
+  const hint = document.getElementById('order-hint');
+  const mergeBtn = document.getElementById('merge-btn');
+  const compressBtn = document.getElementById('compress-btn');
+  const tabs = document.getElementById('tabs');
+  const items = document.getElementById('file-items');
+  const signedWarn = document.getElementById('signed-warn');
+
+  const hasSigned = files.some(e => e.signed);
+  signedWarn.style.display = hasSigned ? 'block' : 'none';
+
+  if (files.length === 0) {
+    list.style.display = 'none';
+    hint.style.display = 'none';
+    tabs.style.display = 'none';
+    mergeBtn.disabled = true;
+    compressBtn.disabled = true;
+    return;
+  }
+
+  list.style.display = 'block';
+  hint.style.display = files.length > 1 ? 'block' : 'none';
+  tabs.style.display = 'flex';
+  mergeBtn.disabled = false;
+  compressBtn.disabled = false;
+  document.getElementById('file-count').textContent = '(' + files.length + ')';
+
+  items.innerHTML = '';
+  files.forEach((entry, i) => {
+    const f = entry.file;
+    const size = f.size < 1024*1024 ? Math.round(f.size/1024)+' KB' : (f.size/1024/1024).toFixed(1)+' MB';
+    const img = isImage(f);
+    let badge = img
+      ? '<span class="badge badge-img">IMG</span>'
+      : entry.signed
+        ? '<span class="badge badge-signed">⚠ Firmado</span>'
+        : '<span class="badge badge-pdf">PDF</span>';
+
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.draggable = true;
+    div.dataset.idx = i;
+    div.innerHTML = `
+      <span class="drag-handle">⠿</span>
+      <span class="file-num">${i+1}</span>
+      ${badge}
+      <span class="file-name" title="${f.name}">${f.name}</span>
+      <span class="file-size">${size}</span>
+      <button class="remove-btn" onclick="removeFile(${i})">×</button>`;
+    div.addEventListener('dragstart', () => { dragSrc = i; div.classList.add('dragging'); });
+    div.addEventListener('dragover', e => e.preventDefault());
+    div.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrc === null || dragSrc === i) return;
+      const moved = files.splice(dragSrc, 1)[0];
+      files.splice(i, 0, moved);
+      renderList();
+    });
+    div.addEventListener('dragend', () => { dragSrc = null; document.querySelectorAll('.file-item').forEach(el => el.classList.remove('dragging')); });
+    items.appendChild(div);
+  });
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i===0&&tab==='merge')||(i===1&&tab==='compress')));
+  const cw = document.getElementById('compress-wrap');
+  const mb = document.getElementById('merge-btn');
+  const cb = document.getElementById('compress-btn');
+  if (tab === 'compress') {
+    cw.classList.add('visible');
+    mb.style.display = 'none';
+    cb.style.display = 'flex';
+    document.getElementById('compress-result').style.display = 'none';
+  } else {
+    cw.classList.remove('visible');
+    mb.style.display = 'flex';
+    cb.style.display = 'none';
+  }
+}
+
+async function run() {
+  if (files.length < 1) return;
+  const status = document.getElementById('status');
+  const mergeBtn = document.getElementById('merge-btn');
+  const compressBtn = document.getElementById('compress-btn');
+  mergeBtn.disabled = true; compressBtn.disabled = true;
+  status.className = 'loading'; status.style.display = 'block';
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const merged = await PDFDocument.create();
+
+    if (currentTab === 'compress') {
+      // Render each page as JPEG via pdf.js then embed
+      const quality = parseFloat(document.getElementById('cq').value);
+      const sc = parseFloat(document.getElementById('cs').value);
+      let totalOriginal = 0;
+
+      for (let fi = 0; fi < files.length; fi++) {
+        const entry = files[fi];
+        const f = entry.file;
+        status.textContent = `Comprimiendo ${fi+1}/${files.length}: ${f.name}`;
+
+        if (isImage(f)) {
+          // image → single page
+          const buf = await f.arrayBuffer();
+          const bytes = new Uint8Array(buf);
+          const c = document.createElement('canvas');
+          await new Promise(res => { const img = new Image(); img.onload = () => { c.width=img.width; c.height=img.height; c.getContext('2d').drawImage(img,0,0); res(); }; img.src = URL.createObjectURL(f); });
+          const dataUrl = c.toDataURL('image/jpeg', quality);
+          const b64 = dataUrl.split(',')[1];
+          const imgBytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+          const emb = await merged.embedJpg(imgBytes);
+          const pg = merged.addPage([c.width, c.height]);
+          pg.drawImage(emb, { x:0, y:0, width:c.width, height:c.height });
+        } else {
+          totalOriginal += f.size;
+          const bytes = entry.bytes;
+          const pdfjsDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
+          for (let pi = 1; pi <= pdfjsDoc.numPages; pi++) {
+            status.textContent = `Comprimiendo ${f.name} — página ${pi}/${pdfjsDoc.numPages}`;
+            const page = await pdfjsDoc.getPage(pi);
+            const vp = page.getViewport({ scale: sc });
+            const c = document.createElement('canvas');
+            c.width = vp.width; c.height = vp.height;
+            await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+            const dataUrl = c.toDataURL('image/jpeg', quality);
+            const b64 = dataUrl.split(',')[1];
+            const imgBytes = Uint8Array.from(atob(b64), cc => cc.charCodeAt(0));
+            const emb = await merged.embedJpg(imgBytes);
+            const pg = merged.addPage([vp.width, vp.height]);
+            pg.drawImage(emb, { x:0, y:0, width:vp.width, height:vp.height });
+          }
+        }
+      }
+
+      status.textContent = 'Generando archivo...';
+      const outBytes = await merged.save({ useObjectStreams: true });
+      const ratio = totalOriginal > 0 ? Math.round((1 - outBytes.length/totalOriginal)*100) : 0;
+      const res = document.getElementById('compress-result');
+      res.style.display = 'block';
+      res.innerHTML = `Original: <b>${fmtSize(totalOriginal)}</b> → Resultado: <b>${fmtSize(outBytes.length)}</b>${ratio > 0 ? ' · <b>−'+ratio+'%</b>' : ''}`;
+      download(outBytes, 'unificado_comprimido.pdf');
+      status.className = 'success';
+      status.textContent = `✓ Descargado · ${files.length} archivos · ${merged.getPageCount()} páginas`;
+
+    } else {
+      // Simple merge
+      for (let fi = 0; fi < files.length; fi++) {
+        const entry = files[fi];
+        const f = entry.file;
+        status.textContent = `Procesando ${fi+1}/${files.length}: ${f.name}`;
+
+        if (isImage(f)) {
+          const buf = await f.arrayBuffer();
+          const bytes = new Uint8Array(buf);
+          let emb;
+          if (/\.png$/i.test(f.name) || f.type === 'image/png') {
+            emb = await merged.embedPng(bytes);
+          } else {
+            emb = await merged.embedJpg(bytes);
+          }
+          const { width, height } = emb.scale(1);
+          const maxW=595, maxH=842, sc=Math.min(maxW/width,maxH/height,1);
+          const pg = merged.addPage([width*sc, height*sc]);
+          pg.drawImage(emb, { x:0, y:0, width:width*sc, height:height*sc });
+        } else {
+          const bytes = entry.bytes;
+          const doc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+          const pages = await merged.copyPages(doc, doc.getPageIndices());
+          pages.forEach(p => merged.addPage(p));
+        }
+      }
+
+      status.textContent = 'Generando archivo...';
+      const outBytes = await merged.save({ useObjectStreams: true });
+      download(outBytes, 'unificado.pdf');
+      const signed = files.filter(e => e.signed).length;
+      status.className = 'success';
+      status.textContent = `✓ Descargado · ${files.length} archivos · ${merged.getPageCount()} páginas${signed ? ' · ⚠ '+signed+' firmado'+(signed>1?'s':'') : ''}`;
+    }
+
+  } catch(e) {
+    status.className = 'error';
+    status.textContent = 'Error: ' + e.message;
+  }
+
+  mergeBtn.disabled = false; compressBtn.disabled = false;
+}
+
+function download(bytes, name) {
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+function fmtSize(b) { return b<1024*1024 ? Math.round(b/1024)+' KB' : (b/1024/1024).toFixed(1)+' MB'; }
+</script>
+</body>
+</html>
